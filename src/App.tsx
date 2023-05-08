@@ -5,6 +5,7 @@ import { NyttNotat } from "./komponenter/NyttNotat";
 import { useLocalStorage } from "./hooks/useLocalStorage";
 import { useMemo } from "react";
 import { v4 as uuidV4 } from "uuid";
+import { NotatForm } from "./komponenter/NotatForm";
 
 export type Notat = {
   id: string,
@@ -35,7 +36,7 @@ function App() {
   const [notater, setNotater] = useLocalStorage<RåNotat[]>("notater", [])
   const [emner, setEmner] = useLocalStorage<Emne[]>("emner", [])
 
-  /* Loop through my different notes, and keep the ifnromation about the notes but also want you to get the tags that have the associated IDs inside if our note that is being stored    */
+  /* Loop through my different notes, and keep the information about the notes but also want you to get the tags that have the associated IDs inside if our note that is being stored    */
   const notaterMedEmner = useMemo(() => {
     return notater.map(notat => {
       return {...notat, emner: emner.filter(emne => notat.emneId.includes(emne.id))}
@@ -48,11 +49,23 @@ function App() {
     })
   }
 
+  function leggTilEmne(emne: Emne) {
+    setEmner(valgteEmner => [...valgteEmner, emne])
+}
   return (
     <Container className="my-4">
       <Routes>
         <Route path="/" element={ <h1>Hjemmeside</h1> } />
-        <Route path="/ny" element={ <NyttNotat onSubmit={onOpprettNotat} /> } />
+        <Route 
+        path="/ny"
+        element={ 
+        <NyttNotat 
+        onSubmit={onOpprettNotat} 
+        onLeggTilEmne={leggTilEmne}
+        tilgjengeligeEmner={emner}
+         /> 
+        } 
+      />
         <Route path="/:id">
           <Route index element={ <h1>Vis ID</h1> } />
           <Route path="rediger" element={ <h1>Rediger ID (notat)</h1> } />
